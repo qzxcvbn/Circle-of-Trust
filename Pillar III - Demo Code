@@ -1,1 +1,87 @@
+# [TECHNICAL_DEMO]: PILLAR III - SOVEREIGN SOCIAL INFRASTRUCTURE (v1.1)
+# Purpose: Demonstrate Dynamic Integrity Gating and Circle of Trust.
+# 
+# THE FORMULA: Ir = T / (H + B)
+# T (Truth): Historical consistency.
+# H (Hiding): Masking of entropy (The Shadow).
+# B (Bias): Deviation from the Standard.
 
+class Node:
+    def __init__(self, name, T=1.0, H=0.0, B=0.0):
+        self.name = name
+        self.T = T  # Truth
+        self.H = H  # Hiding
+        self.B = B  # Bias
+        self.history = []
+
+    def calculate_ir(self):
+        # Calculate raw ratio
+        # We add a tiny noise floor (0.001) to prevent division by zero
+        denominator = max(self.H + self.B, 0.001)
+        raw_ir = self.T / denominator
+        
+        # Gold Standard: Cap the display at 1.0 for "Perfect Integrity"
+        # In production, high values are tracked internally, 
+        # but for display, 1.0 represents the Ideal Sovereign State.
+        return min(raw_ir, 1.0)
+
+    def perform_action(self, is_helpful):
+        """Simulates a user action affecting their integrity."""
+        if is_helpful:
+            # Truth increases, Hiding decreases
+            self.T = min(self.T + 0.1, 2.0)
+            self.H = max(self.H - 0.1, 0.0)
+        else:
+            # Hiding increases, Truth decreases
+            self.H += 0.2
+            self.T = max(self.T - 0.1, 0.0)
+        
+        ir = self.calculate_ir()
+        self.history.append(ir)
+        return ir
+
+class IntegrityGate:
+    def evaluate(self, node):
+        ir = node.calculate_ir()
+        
+        if ir >= 1.0:
+            return f"PASS (Cost: $0.00 | Ir: {ir:.2f})"
+        elif ir > 0.5:
+            # The Integrity Tax: Lower Ir = Higher Cost
+            cost = 2500.00 / ir
+            return f"TAXED (Cost: ${cost:.2f} | Ir: {ir:.2f})"
+        else:
+            return f"BLOCKED (Cost: INFINITE | Ir: {ir:.2f})"
+
+def run_demo():
+    # 1. Initialize Nodes
+    # Alice starts perfect (Maker)
+    maker = Node("Alice (Maker)", T=1.0, H=0.0, B=0.0)
+    # Bob starts compromised (Werewolf)
+    werewolf = Node("Bob (Werewolf)", T=0.2, H=0.9, B=0.9)
+    gate = IntegrityGate()
+
+    print("--- PILLAR III: DYNAMIC INTEGRITY SIMULATION ---\n")
+
+    # 2. Initial State
+    print(f"{maker.name}: {gate.evaluate(maker)}")
+    print(f"{werewolf.name}: {gate.evaluate(werewolf)}")
+    
+    print("\n[ACTION]: Bob attempts to spam the network (Bad Action)...")
+    werewolf.perform_action(is_helpful=False)
+    print(f"{werewolf.name}: {gate.evaluate(werewolf)}")
+
+    print("\n[ACTION]: Alice contributes code (Good Action)...")
+    maker.perform_action(is_helpful=True)
+    print(f"{maker.name}: {gate.evaluate(maker)}")
+
+    print("\n[FEATURE]: Circle of Trust - Alice vouches for Bob...")
+    # In a real system, if Alice (High Ir) vouches for Bob, 
+    # Bob gets a temporary boost, but Alice risks her own score.
+    print("> Bob receives temporary 'Trust Boost' (Simulated T+0.5)")
+    werewolf.T += 0.5
+    print(f"{werewolf.name}: {gate.evaluate(werewolf)}")
+    print("> Note: If Bob attacks now, Alice's score will also drop in production.")
+
+if __name__ == "__main__":
+    run_demo()
